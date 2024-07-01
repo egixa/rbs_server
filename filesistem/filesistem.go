@@ -94,7 +94,7 @@ func dirSize(path string) (int64, error) {
 	return size, err
 }
 
-func main() {
+func GetFolders() {
 	start := time.Now()
 
 	//Считываем флаги
