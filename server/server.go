@@ -5,31 +5,22 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"time"
-
-	Filesistem "github.com/filesistem"
-	//"github.com/filesistem"
 )
 
 const asc = "asc"
 const desc = "desc"
 
-func handleRequest(w http.ResponseWriter, r *http.Request) (string, string, error) {
-	// Разбирает URL-адрес
+func handleRequest(w http.ResponseWriter, r *http.Request) {
+	// Разбираем URL-адрес
 	query := r.URL.Query()
-	/*if err != nil {
-	 http.Error(w, "Ошибка разбора URL-адреса", http.StatusBadRequest)
-	 return
-	}*/
 
-	// Извлекает флаги из строки запроса
+	// Извлекаем флаги из строки запроса
 	rootFolder := query.Get("root")
 	sortOption := query.Get("sort")
 
 	// Валидация флагов
 	if rootFolder == "" {
-		fmt.Println(time.Now().Format("01-02-2006 15:04:05"), "Отсутствуют данные о местоположении директории.")
-		return "", "", fmt.Errorf(fmt.Sprint("Отсутствуют данные о местоположении директории.\nОжидаемые параметры вызова программы:", rootFolder, sortOption))
+		panic("Отсутствуют данные о местоположении директории")
 	}
 	if sortOption != asc && sortOption != desc {
 		sortOption = asc
@@ -40,16 +31,18 @@ func handleRequest(w http.ResponseWriter, r *http.Request) (string, string, erro
 	_, err := os.Stat(rootFolder)
 	if err != nil {
 		if os.IsNotExist(err) {
-			return "", "", fmt.Errorf("Ошибка при обнаружении директории:", err)
+			panic("Такой директории не существует")
+		} else {
+			panic("Ошибка при обнаружении директории")
 		}
 	}
-	return rootFolder, sortOption, nil
+	return
+
+	GetFolders()
 }
 
 func main() {
-	rootFolder, sortOption, err := handleRequest(w http.ResponseWriter, r *http.Request)
-	
-	http.HandleFunc("/", Filesistem.GetFolders(rootFolder, sortOption))      // Устанавливаем роутер
+	http.HandleFunc("/", handleRequest)      // Устанавливаем роутер
 	err := http.ListenAndServe(":3000", nil) // устанавливаем порт веб-сервера
 	if err != nil {
 		log.Fatal("ListenAndServe: ", err)

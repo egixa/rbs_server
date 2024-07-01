@@ -106,8 +106,7 @@ func GetFolders(rootFolder string, sortOption string) {
 	// Получаем список файлов и директорий
 	files, err := dir.Readdir(-1)
 	if err != nil {
-		fmt.Println("Ошибка при прочтении директории", err)
-		return
+		panic("Ошибка при прочтении директории")
 	}
 
 	// Создаем массив структур с информацией о содержании директории
@@ -127,7 +126,6 @@ func GetFolders(rootFolder string, sortOption string) {
 				defer wg.Done()
 
 				dirSize, err := dirSize(filePath)
-
 				if err != nil {
 					return
 				}
