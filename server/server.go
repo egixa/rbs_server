@@ -6,6 +6,8 @@ import (
 	"net/http"
 	"os"
 	"time"
+
+	Filesistem "github.com/filesistem"
 	//"github.com/filesistem"
 )
 
@@ -45,7 +47,9 @@ func handleRequest(w http.ResponseWriter, r *http.Request) (string, string, erro
 }
 
 func main() {
-	http.HandleFunc("/", handleRequest)      // Устанавливаем роутер
+	rootFolder, sortOption, err := handleRequest(w http.ResponseWriter, r *http.Request)
+	
+	http.HandleFunc("/", Filesistem.GetFolders(rootFolder, sortOption))      // Устанавливаем роутер
 	err := http.ListenAndServe(":3000", nil) // устанавливаем порт веб-сервера
 	if err != nil {
 		log.Fatal("ListenAndServe: ", err)

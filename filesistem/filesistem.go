@@ -1,7 +1,6 @@
-package filesistem
+package Filesistem
 
 import (
-	"flag"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -14,7 +13,7 @@ const asc = "asc"
 const desc = "desc"
 
 // flagParse считывает флаги из строки терминала
-func flagParse() (string, string, error) {
+/*func flagParse() (string, string, error) {
 	rootFolder := flag.String("root", "", "Путь до директории для вывода структуры\n")
 	sortOption := flag.String("sort", "", "Параметр сортировки:\n по убыванию -\n по возрастанию -")
 	flag.Parse()
@@ -39,7 +38,7 @@ func flagParse() (string, string, error) {
 		}
 	}
 	return *rootFolder, *sortOption, nil
-}
+}*/
 
 // sortDirectory сортирует директории по входному параметру
 func sortDirectory(directoryContent []File, sortOption string) []File {
@@ -94,14 +93,8 @@ func dirSize(path string) (int64, error) {
 	return size, err
 }
 
-func GetFolders() {
+func GetFolders(rootFolder string, sortOption string) {
 	start := time.Now()
-
-	//Считываем флаги
-	rootFolder, sortOption, err := flagParse()
-	if err != nil {
-		panic(err)
-	}
 
 	// Открываем директорию
 	dir, err := os.Open(rootFolder)
