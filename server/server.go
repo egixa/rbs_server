@@ -18,6 +18,7 @@ func validateArgs(rootFolder string, sortOption string) (string, error) {
 	if sortOption != Filesistem.Asc && sortOption != Filesistem.Desc {
 		sortOption = Filesistem.Asc
 		fmt.Println("Введен некорректный параметр сортировки. По умолчанию будет использована сортировка по возрастанию.")
+		return sortOption, nil
 	}
 
 	// Проверка существования директории
@@ -29,27 +30,30 @@ func validateArgs(rootFolder string, sortOption string) (string, error) {
 			return "", fmt.Errorf("Ошибка при обнаружении директории", err)
 		}
 	}
-	return "", nil
+	return sortOption, nil
 }
 
 // handleRequest принимает ответ от сервера и отправляет отсортированный массив с информацией о содержимом
 func handleRequest(w http.ResponseWriter, r *http.Request) {
 	// Разбираем URL-адрес и извлекаем флаги
 	query := r.URL.Query()
+
 	rootFolder := query.Get("root")
 	sortOption := query.Get("sort")
+
+	fmt.Println("Host:", query.Get("localhost"))
 
 	// Проверяем валидность флагов
 	sortOption, err := validateArgs(rootFolder, sortOption)
 	if err != nil {
-		fmt.Print(err)
+		fmt.Println(err)
 		return
 	}
 
 	// Получаем отсортированное содержимое директории
 	files, err := Filesistem.GetFolder(rootFolder, sortOption)
 	if err != nil {
-		fmt.Print(err)
+		fmt.Println(err)
 		return
 	}
 
@@ -58,24 +62,27 @@ func handleRequest(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		http.Error(w, "Ошибка при преобразовании в json", http.StatusNotFound)
 	}
-
+	w.Header().Set("Content-Type", "application/json")
+	_, err = w.Write(jsonBytes)
 	/*// Отправляем данные на сервер
 	w.Header().Set("Content-Type", "application/json")
 	_, err = w.Write(jsonBytes)
 	if err != nil {
-		log.Printf("error while writing: %v", err)
-		return
+	 log.Printf("error while writing: %v", err)
+	 return
 	}*/
-	fmt.Fprintf(w, string(jsonBytes))
+
+	//fmt.Fprintf(w, string(jsonBytes))
 
 }
 
 func main() {
+
 	// Устанавливаем роутер
 	http.HandleFunc("/", handleRequest)
 
 	// устанавливаем порт веб-сервера
-	err := http.ListenAndServe(":3000", nil)
+	err := http.ListenAndServe(":3007", nil)
 	if err != nil {
 		log.Fatal("ListenAndServe: ", err)
 	}

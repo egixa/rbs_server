@@ -13,6 +13,7 @@ const Desc = "desc"
 
 // sortDirectory сортирует директории по входному параметру
 func sortDirectory(directoryContent []File, sortOption string) []File {
+
 	switch sortOption {
 	case Desc:
 		sort.Slice(directoryContent, func(i, j int) (less bool) {
