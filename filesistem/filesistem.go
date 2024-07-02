@@ -6,48 +6,19 @@ import (
 	"path/filepath"
 	"sort"
 	"sync"
-	//"encoding/json"
 )
 
-const asc = "asc"
-const desc = "desc"
-
-// flagParse считывает флаги из строки терминала
-/*func flagParse() (string, string, error) {
-	rootFolder := flag.String("root", "", "Путь до директории для вывода структуры\n")
-	sortOption := flag.String("sort", "", "Параметр сортировки:\n по убыванию -\n по возрастанию -")
-	flag.Parse()
-
-	// Проверка флагов на корректность ввода
-	if *rootFolder == "" {
-		fmt.Println(time.Now().Format("01-02-2006 15:04:05"), "Отсутствуют данные о местоположении директории.")
-		fmt.Println("Ожидаемые параметры вызова программы:")
-		flag.PrintDefaults()
-		return "", "", fmt.Errorf(fmt.Sprint("Отсутствуют данные о местоположении директории.\nОжидаемые параметры вызова программы:", rootFolder, sortOption))
-	}
-	if *sortOption != asc && *sortOption != desc {
-		*sortOption = asc
-		fmt.Println("Введен некорректный параметр сортировки. По умолчанию будет использована сортировка по возрастанию.")
-	}
-
-	// Проверка существования директории
-	_, err := os.Stat(*rootFolder)
-	if err != nil {
-		if os.IsNotExist(err) {
-			return "", "", fmt.Errorf("Ошибка при обнаружении директории:", err)
-		}
-	}
-	return *rootFolder, *sortOption, nil
-}*/
+const Asc = "asc"
+const Desc = "desc"
 
 // sortDirectory сортирует директории по входному параметру
 func sortDirectory(directoryContent []File, sortOption string) []File {
 	switch sortOption {
-	case desc:
+	case Desc:
 		sort.Slice(directoryContent, func(i, j int) (less bool) {
 			return directoryContent[i].Size > directoryContent[j].Size
 		})
-	case asc:
+	case Asc:
 		sort.Slice(directoryContent, func(i, j int) (less bool) {
 			return directoryContent[i].Size < directoryContent[j].Size
 		})
@@ -73,46 +44,46 @@ func formatSize(size int64) string {
 
 // Создание массива информации о файлах
 type File struct {
-	Type string `json:"type"`
-	Name string `json:"name"`
-	Size int64  `json:"size"`
+	Type       string `json:"type"`
+	Name       string `json:"name"`
+	Size       int64  `json:"size"`
+	SizeFormat string `json:"formatingSize"`
 }
 
 // dirSize определяет размер директории
 func dirSize(path string) (int64, error) {
-
-	var size int64
+	var sizeSumm int64
 	err := filepath.Walk(path, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
-			fmt.Println("Ошибка при обходе директории:", err)
-			return err
+			return fmt.Errorf("Ошибка при обходе директории:%w", err)
 		}
-		size += info.Size()
+		sizeSumm += info.Size()
 		return nil
 	})
-	return size, err
+	return sizeSumm, err
 }
 
-func GetFolders(rootFolder string, sortOption string) []File {
-	//start := time.Now()
+// GetFolder сортирует директорию и выводит информацию о размере содержимого
+func GetFolder(rootFolder string, sortOption string) ([]File, error) {
 
 	// Открываем директорию
 	dir, err := os.Open(rootFolder)
 	if err != nil {
-		panic("Ошибка при открытии директории")
+		return nil, fmt.Errorf("Ошибка при открытии директории%w", err)
 	}
 	defer dir.Close()
 
 	// Получаем список файлов и директорий
 	files, err := dir.Readdir(-1)
 	if err != nil {
-		panic("Ошибка при прочтении директории")
+		return nil, fmt.Errorf("Ошибка при прочтении директории%w", err)
 	}
 
 	// Создаем массив структур с информацией о содержании директории
 	directoryContent := []File{}
 
 	var wg sync.WaitGroup
+
 	// Записываем имена, размеры файлов и директорий в массив структур
 	for _, file := range files {
 		fileName := file.Name()
@@ -121,21 +92,18 @@ func GetFolders(rootFolder string, sortOption string) []File {
 
 		if file.IsDir() {
 			wg.Add(1)
-
 			go func() {
 				defer wg.Done()
 
 				dirSize, err := dirSize(filePath)
-
 				if err != nil {
 					return
 				}
 
-				directoryContent = append(directoryContent, File{"Директория", fileName, dirSize})
+				directoryContent = append(directoryContent, File{"Директория", fileName, dirSize, formatSize(dirSize)})
 			}()
-
 		} else {
-			directoryContent = append(directoryContent, File{"Файл", fileName, fileSize})
+			directoryContent = append(directoryContent, File{"Файл", fileName, fileSize, formatSize(fileSize)})
 			continue
 		}
 	}
@@ -143,14 +111,6 @@ func GetFolders(rootFolder string, sortOption string) []File {
 
 	// Сортируем содержимое директории по указанному параметру
 	directoryContent = sortDirectory(directoryContent, sortOption)
-	/*
-		// Выводим содержимое в консоль
-		for _, file := range directoryContent {
-			fmt.Printf("%s %s Размер: %s\n", file.Type, file.Name, formatSize(file.Size))
-		}
-	*/
-	// Время выполнения
-	//duration := time.Since(start)
-	return directoryContent
-	//fmt.Println("Программа завершена. Время выполнения:", duration)
+
+	return directoryContent, nil
 }
