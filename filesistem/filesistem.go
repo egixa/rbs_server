@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"sort"
 	"sync"
-	"time"
+	//"encoding/json"
 )
 
 const asc = "asc"
@@ -73,9 +73,9 @@ func formatSize(size int64) string {
 
 // Создание массива информации о файлах
 type File struct {
-	Type string
-	Name string
-	Size int64
+	Type string `json:"type"`
+	Name string `json:"name"`
+	Size int64  `json:"size"`
 }
 
 // dirSize определяет размер директории
@@ -93,8 +93,8 @@ func dirSize(path string) (int64, error) {
 	return size, err
 }
 
-func GetFolders(rootFolder string, sortOption string) {
-	start := time.Now()
+func GetFolders(rootFolder string, sortOption string) []File {
+	//start := time.Now()
 
 	// Открываем директорию
 	dir, err := os.Open(rootFolder)
@@ -106,8 +106,7 @@ func GetFolders(rootFolder string, sortOption string) {
 	// Получаем список файлов и директорий
 	files, err := dir.Readdir(-1)
 	if err != nil {
-		fmt.Println("Ошибка при прочтении директории", err)
-		return
+		panic("Ошибка при прочтении директории")
 	}
 
 	// Создаем массив структур с информацией о содержании директории
@@ -144,13 +143,14 @@ func GetFolders(rootFolder string, sortOption string) {
 
 	// Сортируем содержимое директории по указанному параметру
 	directoryContent = sortDirectory(directoryContent, sortOption)
-
-	// Выводим содержимое в консоль
-	for _, file := range directoryContent {
-		fmt.Printf("%s %s Размер: %s\n", file.Type, file.Name, formatSize(file.Size))
-	}
-
+	/*
+		// Выводим содержимое в консоль
+		for _, file := range directoryContent {
+			fmt.Printf("%s %s Размер: %s\n", file.Type, file.Name, formatSize(file.Size))
+		}
+	*/
 	// Время выполнения
-	duration := time.Since(start)
-	fmt.Println("Программа завершена. Время выполнения:", duration)
+	//duration := time.Since(start)
+	return directoryContent
+	//fmt.Println("Программа завершена. Время выполнения:", duration)
 }

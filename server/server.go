@@ -1,26 +1,20 @@
-package server
+package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
 	"os"
-	"time"
-
-	Filesistem "github.com/filesistem"
-	//"github.com/filesistem"
+	Filesistem "svr/filesistem"
 )
 
 const asc = "asc"
 const desc = "desc"
 
-func handleRequest(w http.ResponseWriter, r *http.Request) (string, string, error) {
+func handleRequest(w http.ResponseWriter, r *http.Request) {
 	// Разбирает URL-адрес
 	query := r.URL.Query()
-	/*if err != nil {
-	 http.Error(w, "Ошибка разбора URL-адреса", http.StatusBadRequest)
-	 return
-	}*/
 
 	// Извлекает флаги из строки запроса
 	rootFolder := query.Get("root")
@@ -28,8 +22,7 @@ func handleRequest(w http.ResponseWriter, r *http.Request) (string, string, erro
 
 	// Валидация флагов
 	if rootFolder == "" {
-		fmt.Println(time.Now().Format("01-02-2006 15:04:05"), "Отсутствуют данные о местоположении директории.")
-		return "", "", fmt.Errorf(fmt.Sprint("Отсутствуют данные о местоположении директории.\nОжидаемые параметры вызова программы:", rootFolder, sortOption))
+		panic("Отсутствуют данные о местоположении директории")
 	}
 	if sortOption != asc && sortOption != desc {
 		sortOption = asc
@@ -40,16 +33,22 @@ func handleRequest(w http.ResponseWriter, r *http.Request) (string, string, erro
 	_, err := os.Stat(rootFolder)
 	if err != nil {
 		if os.IsNotExist(err) {
-			return "", "", fmt.Errorf("Ошибка при обнаружении директории:", err)
+			http.Error(w, "Такой директории не существует", http.StatusNotFound)
+		} else {
+			panic("Ошибка при обнаружении директории")
 		}
 	}
-	return rootFolder, sortOption, nil
+
+	files := Filesistem.GetFolders(rootFolder, sortOption)
+	jsonBytes, err := json.Marshal(files)
+	if err != nil {
+		panic("Ошибка при преобразовании в json")
+	}
+	fmt.Fprintf(w, string(jsonBytes))
 }
 
 func main() {
-	rootFolder, sortOption, err := handleRequest(w http.ResponseWriter, r *http.Request)
-	
-	http.HandleFunc("/", Filesistem.GetFolders(rootFolder, sortOption))      // Устанавливаем роутер
+	http.HandleFunc("/", handleRequest)      // Устанавливаем роутер
 	err := http.ListenAndServe(":3000", nil) // устанавливаем порт веб-сервера
 	if err != nil {
 		log.Fatal("ListenAndServe: ", err)
