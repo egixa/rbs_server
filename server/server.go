@@ -1,13 +1,22 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
 	"os"
+	"os/signal"
 	Filesistem "svr/filesistem"
+	"syscall"
+	"time"
 )
+
+// Config - структура для хранения конфигурации
+type Config struct {
+	Port int `json:"port"`
+}
 
 // validateArgs проверяет валидные или невалидные флаги
 func validateArgs(rootFolder string, sortOption string) (string, error) {
@@ -40,8 +49,6 @@ func handleRequest(w http.ResponseWriter, r *http.Request) {
 
 	rootFolder := query.Get("root")
 	sortOption := query.Get("sort")
-
-	fmt.Println("Host:", query.Get("localhost"))
 
 	// Проверяем валидность флагов
 	sortOption, err := validateArgs(rootFolder, sortOption)
@@ -78,12 +85,56 @@ func handleRequest(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 
+	// Читаем конфигурацию из файла
+	file, err := os.Open("./config/config.json")
+	if err != nil {
+		log.Fatalf("Ошибка открытия конфигурации: %v", err)
+	}
+	defer file.Close()
+
+	var config Config
+	decoder := json.NewDecoder(file)
+	if err := decoder.Decode(&config); err != nil {
+		log.Fatalf("Ошибка разбора JSON: %v", err)
+	}
+
 	// Устанавливаем роутер
 	http.HandleFunc("/", handleRequest)
 
-	// устанавливаем порт веб-сервера
-	err := http.ListenAndServe(":3007", nil)
-	if err != nil {
-		log.Fatal("ListenAndServe: ", err)
+	/*
+		// устанавливаем порт веб-сервера
+		err := http.ListenAndServe(":3007", nil)
+		if err != nil {
+			log.Fatal("ListenAndServe: ", err)
+		}
+	*/
+
+	// Создаем сервер
+	srv := &http.Server{
+		Addr:    fmt.Sprintf(":%d", config.Port),
+		Handler: http.HandlerFunc(handleRequest),
 	}
+
+	// Запускаем сервер в отдельной горутине
+	go func() {
+		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			log.Fatalf("ListenAndServe: %v", err)
+		}
+	}()
+
+	// Создаем канал для сигналов
+	interrupt := make(chan os.Signal, 1)
+	signal.Notify(interrupt, os.Interrupt, syscall.SIGTERM)
+
+	// Ожидаем сигнал прерывания
+	<-interrupt
+
+	// Даем серверу 5 секунд на завершение работы
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	// Завершаем работу сервера
+	srv.Shutdown(ctx)
+	fmt.Println("Сервер остановлен")
+
 }
