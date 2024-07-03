@@ -1,3 +1,4 @@
+/* Стиль таблицы*/
 table {
     border-collapse: collapse;
     width: 100%;
@@ -14,20 +15,19 @@ table {
     background-color: #f0f0f0;
   }
   
+/* Позиционирование содержания страницы*/
   .wrapper {
     justify-content: center;
     align-items: center;
     min-height: 100vh; /* Занимает всю высоту экрана */
-    margin-left: 5%;
-    margin-right: 5%;
-    margin-top: 5%;
-    margin-bottom: 5%;
+    margin: 5%;
   }
   
   .container {
     text-align: center;
   }
-  
+
+/*Расположение кнопок относительно контейнера*/
   .buttons {
     margin-bottom: 10px;
     display: flex; /* Делаем кнопки блоком Flexbox */
@@ -36,16 +36,18 @@ table {
     margin-bottom: 10px;
   }
   
+  /* Стиль кнопок*/
   .back-button, .sort-button {
     padding: 8px 16px;
     margin: 0 10px;
     border: none;
-    background-color: #4CAF50;
+    background-color: #26a85c;
     color: white;
     font-size: 16px;
     cursor: pointer;
   }
 
+/* Стиль пути директории*/
   .path {
     text-align: left;
     }

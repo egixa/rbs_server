@@ -101,14 +101,6 @@ func main() {
 	// Устанавливаем роутер
 	http.HandleFunc("/", handleRequest)
 
-	/*
-		// устанавливаем порт веб-сервера
-		err := http.ListenAndServe(":3007", nil)
-		if err != nil {
-			log.Fatal("ListenAndServe: ", err)
-		}
-	*/
-
 	// Создаем сервер
 	srv := &http.Server{
 		Addr:    fmt.Sprintf(":%d", config.Port),

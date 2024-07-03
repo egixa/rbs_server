@@ -49,6 +49,23 @@
       sortAscending = !sortAscending;
     sortButton.textContent = sortAscending ? 'по возрастанию' : 'по убыванию' ;
     })
+    
+      // Отправляем запрос на сервер
+      const response = await fetch('/sort', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          ascending: sortAscending
+        })
+      });
+
+      // Обрабатываем ответ от сервера
+      const data = await response.json();
+      // Обновляем таблицу с новыми данными
+      // ...
+
   </script>
 
 </body>
