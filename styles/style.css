@@ -1,0 +1,52 @@
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 0 auto;
+  }
+  
+  th, td {
+    border: 1px solid black;
+    padding: 8px;
+    text-align: left;
+  }
+  
+  th {
+    background-color: #f0f0f0;
+  }
+  
+  .wrapper {
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh; /* Занимает всю высоту экрана */
+    margin-left: 5%;
+    margin-right: 5%;
+    margin-top: 5%;
+    margin-bottom: 5%;
+  }
+  
+  .container {
+    text-align: center;
+  }
+  
+  .buttons {
+    margin-bottom: 10px;
+    display: flex; /* Делаем кнопки блоком Flexbox */
+    justify-content: space-between; /* Располагаем кнопки по краям */
+    width: 100%; /* Задаем ширину блока кнопок */
+    margin-bottom: 10px;
+  }
+  
+  .back-button, .sort-button {
+    padding: 8px 16px;
+    margin: 0 10px;
+    border: none;
+    background-color: #4CAF50;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+  }
+
+  .path {
+    text-align: left;
+    }
+  
