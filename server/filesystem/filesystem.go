@@ -70,14 +70,14 @@ func GetFolder(rootFolder string, sortOption string) ([]File, error) {
 	// Открываем директорию
 	dir, err := os.Open(rootFolder)
 	if err != nil {
-		return nil, fmt.Errorf("Ошибка при открытии директории%w", err)
+		return nil, fmt.Errorf("Ошибка при открытии директории%w ", err)
 	}
 	defer dir.Close()
 
 	// Получаем список файлов и директорий
 	files, err := dir.Readdir(-1)
 	if err != nil {
-		return nil, fmt.Errorf("Ошибка при прочтении директории%w", err)
+		return nil, fmt.Errorf("Ошибка при прочтении директории%w ", err)
 	}
 
 	// Создаем массив структур с информацией о содержании директории

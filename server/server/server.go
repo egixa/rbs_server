@@ -42,7 +42,7 @@ func validateArgs(rootFolder string, sortOption string) (string, error) {
 	return sortOption, nil
 }
 
-const p = "/"
+//const p = "/"
 
 // handleRequest принимает ответ от сервера и отправляет отсортированный массив с информацией о содержимом
 func handleRequest(w http.ResponseWriter, r *http.Request) {
@@ -51,7 +51,7 @@ func handleRequest(w http.ResponseWriter, r *http.Request) {
 	// Разбираем URL-адрес и извлекаем флаги
 	query := r.URL.Query()
 
-	rootFolder := p + query.Get("root")
+	rootFolder := query.Get("root")
 	sortOption := query.Get("sort")
 
 	// Проверяем валидность флагов

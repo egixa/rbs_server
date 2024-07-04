@@ -1,17 +1,17 @@
 const url = "http://localhost:3007/";
+const path = document.querySelector(".path").innerHTML;
 
-function getTableFolder(){
-    const response = fetch(url + "?root=&sort=" + sortButton.textContent, { // Запрос на сервер
+async function getTableFolder(link){
+    response = await fetch(url + "?root=" + path + link.textContent + "&sort=" + sortButton.textContent, { // Запрос на сервер
         method: 'GET',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded' 
         }
     });
-    const data = response.json(); // Получаем JSON-данные
+    response = await response.json();
     fileTableBody.innerHTML = '';
-    return data
-
-};
+    return response
+}
 
 function createTable(data){
      // Заполняем таблицу данными
@@ -27,6 +27,14 @@ function createTable(data){
             link.href = "#"; // Замените на реальный URL, если необходимо
             link.textContent = item.name;
             link.addEventListener('click', async (event) => {
+                if (path === "/"){
+                    path = path + link.textContent
+                    console.log()
+                }
+                else{
+                    path = path + "/" + link.textContent
+                }
+                clickGet(link)
                 });
             nameCell.appendChild(link);
         } else {
@@ -37,9 +45,10 @@ function createTable(data){
       });
 }
 
-function clickGet(){
-    data = getTableFolder()
-    createTable(data)
+async function clickGet(link){
+    data = await getTableFolder(link);
+
+    createTable(data);
 }
 
 const sortButton = document.querySelector('.sort-button');
@@ -54,13 +63,13 @@ const sortButton = document.querySelector('.sort-button');
     }
     else {sortButton.textContent = "desc"};
     
-    const response = await fetch(url + "?root=&sort=" + sortButton.textContent, { // Запрос на сервер
+    const response = await fetch(url + "?root=" + path + "&sort=" + sortButton.textContent, { // Запрос на сервер
         method: 'GET',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded' 
         }
     });
-        
+    
     const data = await response.json(); // Получаем JSON-данные
     
       // Очищаем таблицу
@@ -79,7 +88,7 @@ const sortButton = document.querySelector('.sort-button');
             link.href = "#"; // Замените на реальный URL, если необходимо
             link.textContent = item.name;
             link.addEventListener('click', async (event) => {
-                clickGet()
+                clickGet(link)
             });
             nameCell.appendChild(link);
         }
