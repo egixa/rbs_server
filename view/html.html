@@ -3,6 +3,7 @@
 <head>
   <title>Таблица с данными</title>
   <link rel="stylesheet" href="../styles/style.css">
+  
 </head>
 <body>
 
@@ -12,7 +13,7 @@
         <button class="back-button">Назад</button>
         <div class="sort">
           <span class="sort-label">Сортировка:</span>
-          <button class="sort-button">по возрастанию</button>
+          <button class="sort-button">asc</button>
         </div>
         
       </div>
@@ -25,48 +26,13 @@
             <th>Размер</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody id="fileTableBody">
           <tr>
-            <td>Директория</td>
-            <td>irina</td>
-            <td>56,3 мб</td>
-          </tr>
-          <tr>
-            <td>Файл</td>
-            <td>html.html</td>
-            <td>53 кб</td>
           </tr>
         </tbody>
       </table>
     </div>
   </div>
-
-  <script>
-    const sortButton = document.querySelector('.sort-button');
-    let sortAscending = true;
-
-    sortButton.addEventListener('click', () => {
-      sortAscending = !sortAscending;
-    sortButton.textContent = sortAscending ? 'по возрастанию' : 'по убыванию' ;
-    })
-    
-      // Отправляем запрос на сервер
-      const response = await fetch('/sort', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          ascending: sortAscending
-        })
-      });
-
-      // Обрабатываем ответ от сервера
-      const data = await response.json();
-      // Обновляем таблицу с новыми данными
-      // ...
-
-  </script>
-
+  <script src="js.js"></script>
 </body>
 </html>

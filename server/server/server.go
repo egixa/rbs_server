@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
-	Filesistem "svr/filesistem"
+	Filesistem "svr/filesystem"
 	"syscall"
 	"time"
 )
@@ -42,12 +42,16 @@ func validateArgs(rootFolder string, sortOption string) (string, error) {
 	return sortOption, nil
 }
 
+const p = "/"
+
 // handleRequest принимает ответ от сервера и отправляет отсортированный массив с информацией о содержимом
 func handleRequest(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+
 	// Разбираем URL-адрес и извлекаем флаги
 	query := r.URL.Query()
 
-	rootFolder := query.Get("root")
+	rootFolder := p + query.Get("root")
 	sortOption := query.Get("sort")
 
 	// Проверяем валидность флагов
@@ -69,8 +73,12 @@ func handleRequest(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		http.Error(w, "Ошибка при преобразовании в json", http.StatusNotFound)
 	}
+	
+	w.Write(jsonBytes)
 	w.Header().Set("Content-Type", "application/json")
-	_, err = w.Write(jsonBytes)
+	
+
+
 	/*// Отправляем данные на сервер
 	w.Header().Set("Content-Type", "application/json")
 	_, err = w.Write(jsonBytes)
@@ -92,9 +100,9 @@ func main() {
 	}
 	defer file.Close()
 
-	var config Config
+	var Config Config
 	decoder := json.NewDecoder(file)
-	if err := decoder.Decode(&config); err != nil {
+	if err := decoder.Decode(&Config); err != nil {
 		log.Fatalf("Ошибка разбора JSON: %v", err)
 	}
 
@@ -103,7 +111,7 @@ func main() {
 
 	// Создаем сервер
 	srv := &http.Server{
-		Addr:    fmt.Sprintf(":%d", config.Port),
+		Addr:    fmt.Sprintf(":%d", Config.Port),
 		Handler: http.HandlerFunc(handleRequest),
 	}
 
