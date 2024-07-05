@@ -8,14 +8,14 @@ import (
  "net/http"
  "os"
  "os/signal"
- Filesistem "svr/filesystem"
+ Filesistem "srv/server/filesystem"
  "syscall"
  "time"
 )
 
 // Config - структура для хранения конфигурации
 type Config struct {
- Port int json:"port"
+ Port int `json:"port"`
 }
 
 // validateArgs проверяет валидные или невалидные флаги
@@ -41,6 +41,8 @@ func validateArgs(rootFolder string, sortOption string) (string, error) {
  }
  return sortOption, nil
 }
+
+//const p = "/"
 
 // handleRequest принимает ответ от сервера и отправляет отсортированный массив с информацией о содержимом
 func handleRequest(w http.ResponseWriter, r *http.Request) {

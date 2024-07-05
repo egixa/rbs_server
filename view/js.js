@@ -18,11 +18,6 @@ async function getTableFolder(link){
     }
     else {
         linkContent = link.textContent;
-        // if (path === "/") {
-        //     path += link.textContent;
-        // } else {
-        //     path += "/" + link.textContent;
-        // }
     }
 
     response = await fetch(url + "?root=" + path + "/" + linkContent + "&sort=" + sortButton.textContent, { // Запрос на сервер
@@ -30,8 +25,14 @@ async function getTableFolder(link){
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded' 
         }
-    }).then(response => response.json()).catch();
-    return response
+    }).then((response) => {
+        if (!response.ok) { 
+            throw new Error('Error occurred!')
+        } 
+        return response.json()
+    }).catch((err)=>{
+            console.log(err)
+    })
 }
 
 // Создание таблицы с данными из GET-запроса
