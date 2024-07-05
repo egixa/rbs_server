@@ -1,13 +1,4 @@
-const url = "http://localhost:3007/";
-const Asc = "asc"
-const Desc = "desc"
-
-function splitPath(path){
-    const parts = path.split('/');
-    parts.pop();
-    path = parts.join('/');
-    return path
-}
+export {}
 //GET-запрос на получение содержимого директории
 async function getTableFolder(link){
     path = document.querySelector('.path').innerHTML
@@ -20,7 +11,7 @@ async function getTableFolder(link){
         linkContent = link.textContent;
     }
 
-    response = await fetch(url + "?root=" + path + "/" + linkContent + "&sort=" + sortButton.textContent, { // Запрос на сервер
+    response = await fetch(url + "?root=" + path + "/" + linkContent + "&sort=" + sortButton.textContent, { 
         method: 'GET',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded' 
@@ -77,44 +68,3 @@ async function clickGet(link){
     data = await getTableFolder(link);
     createTable(data);
 }
-
-// Кнопка сортировки
-const sortButton = document.querySelector('.sort-button');
-let sortAscending = false;
-let AskDesk = Asc;   
-
-//Обработка нажатия на кнопку сортировки
-sortButton.addEventListener('click', async() => {
-    sortAscending = !sortAscending;
-    sortButton.textContent = sortAscending ? Asc : Desc ;
-    if (sortAscending == true){
-        sortButton.textContent =  Asc;
-    }
-    else {sortButton.textContent = Desc};
-    
-    path = document.querySelector('.path').innerHTML
-
-    const response = await fetch(url + "?root=" + path + "&sort=" + sortButton.textContent, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded' 
-        }
-    });
-    const data = await response.json(); // Получаем JSON-данные
-    createTable(data);
-    })
-
-    //Обратоботка нажатия на кнопку Назад
-const backButton = document.querySelector('.back-button');
-backButton.addEventListener('click', async () => {
-    const link = "Назад";
-    clickGet(link);
-
-    path = document.querySelector('.path').innerHTML
-    if (path === "/"){
-        //
-    }
-    else{
-        document.querySelector('.path').innerHTML = splitPath(path);
-    }
-})
