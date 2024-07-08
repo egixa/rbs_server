@@ -65,6 +65,6 @@ function createTable(data){
 
 // Нажатие на ссылку в директорию
 async function clickGet(link){
-    data = await getTableFolder(link);
+    let data = await getTableFolder(link);
     createTable(data);
 }

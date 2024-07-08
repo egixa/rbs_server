@@ -42,8 +42,6 @@ func validateArgs(rootFolder string, sortOption string) (string, error) {
  return sortOption, nil
 }
 
-//const p = "/"
-
 // handleRequest принимает ответ от сервера и отправляет отсортированный массив с информацией о содержимом
 func handleRequest(w http.ResponseWriter, r *http.Request) {
  w.Header().Set("Access-Control-Allow-Origin", "*")
@@ -76,19 +74,6 @@ func handleRequest(w http.ResponseWriter, r *http.Request) {
  
  w.Write(jsonBytes)
  w.Header().Set("Content-Type", "application/json")
- 
-
-
- /*// Отправляем данные на сервер
- w.Header().Set("Content-Type", "application/json")
- _, err = w.Write(jsonBytes)
- if err != nil {
-  log.Printf("error while writing: %v", err)
-  return
- }*/
-
- //fmt.Fprintf(w, string(jsonBytes))
-
 }
 
 func main() {
